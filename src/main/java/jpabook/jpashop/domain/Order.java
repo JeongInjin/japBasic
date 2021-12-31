@@ -8,6 +8,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static javax.persistence.CascadeType.*;
+import static javax.persistence.FetchType.*;
+
 @Entity
 @Table(name = "orders")
 @Getter
@@ -19,14 +22,14 @@ public class Order {
     @Column(name = "order_id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "memeber_id")
     private Member member;
 
-    @OneToMany(mappedBy = "order")
+    @OneToMany(mappedBy = "order", cascade = ALL)
     private List<OrderItem> orderItems = new ArrayList<>();
 
-    @OneToOne
+    @OneToOne(fetch = LAZY, cascade = ALL)
     @JoinColumn(name = "delivery_id")
     private Delivery delivery;
 
@@ -34,4 +37,20 @@ public class Order {
 
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
+
+    //연관관계 매서드
+    public void setMember(Member member){
+        this.member = member;
+        member.getOrders().add(this);
+    }
+
+    public void setOrderitem(OrderItem orderItem){
+        orderItems.add(orderItem);
+        orderItem.setOrder(this);
+    }
+
+    public void setDelivery(Delivery delivery){
+        this.delivery = delivery;
+        delivery.setOrder(this);
+    }
 }
