@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
     JUnit5 부터는 @RunWith 가 아닌 Extension 이라는 일관된 방법을 사용한다.
     @SpringBootTest 어노테이셔 안에 @ExtendWith(SpringExtension.class) 을 포함한다.
  */
-//-----> @ExtendWith(SpringExtension.class)
+//----> @ExtendWith(SpringExtension.class)
 
 @SpringBootTest
 @Transactional
