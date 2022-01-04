@@ -80,6 +80,28 @@ public class OrderApiController {
         return collect;
     }
 
+    /*
+     * fetch join 으로 안하여 sql 이 1번 실행
+     * `distinct` 를 사용하는 이유
+     *   ㄴ 1:N 조인 으로 인한 row 수 증가로 distinct 로 중복을 걸러준다. sql 로 조회시에는 N 개의 row 가 조회되지만 jpa 에서는 Key 같아 ref 가 같은걸로 인식하여 중복을 걸러준다.
+     * 치명적인 단점 : 페이징 불가능.
+     * collection fetch 조인은 1개만 사용할 수 있다. collection 둘 이상에 fetch 조인을 사용할 시 데이터가 부정합 할 수 있다.
+     * */
+    @GetMapping("/api/v3/orders")
+    public List<OrderDto> ordersV3() {
+        List<Order> orders = orderRepository.findAllWithItem();
+
+        //repository 에 distinct 가 없으면 2 * 2 개가 중복없이 노출 된다.
+        for (Order order : orders) {
+            System.out.println("order ref = " + order + " id = " + order.getId());
+        }
+        List<OrderDto> result = orders.stream()
+                .map(OrderDto::new)
+                .collect(toList());
+
+        return result;
+    }
+
     @Data
     static class OrderDto {
 
