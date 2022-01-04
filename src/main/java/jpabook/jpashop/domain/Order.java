@@ -10,8 +10,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static javax.persistence.CascadeType.*;
-import static javax.persistence.FetchType.*;
+import static javax.persistence.CascadeType.ALL;
+import static javax.persistence.FetchType.LAZY;
 
 @Entity
 @Table(name = "orders")
@@ -41,6 +41,20 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
+    //--생성 메서드--
+    public static Order createOrder(Member member, Delivery delivery, OrderItem... orderItems) {
+        Order order = new Order();
+        order.setMember(member);
+        order.setDelivery(delivery);
+        for (OrderItem orderItem : orderItems) {
+            order.addOrderItem(orderItem);
+        }
+        order.setStatus(OrderStatus.ORDER);
+        order.setOrderDate(LocalDateTime.now());
+
+        return order;
+    }
+
     //==연관관계 매서드==
     public void setMember(Member member) {
         this.member = member;
@@ -55,20 +69,6 @@ public class Order {
     public void setDelivery(Delivery delivery) {
         this.delivery = delivery;
         delivery.setOrder(this);
-    }
-
-    //--생성 메서드--
-    public static Order createOrder(Member member, Delivery delivery, OrderItem... orderItems) {
-        Order order = new Order();
-        order.setMember(member);
-        order.setDelivery(delivery);
-        for (OrderItem orderItem : orderItems) {
-            order.addOrderItem(orderItem);
-        }
-        order.setStatus(OrderStatus.ORDER);
-        order.setOrderDate(LocalDateTime.now());
-
-        return order;
     }
 
     //--비즈니스 로직--

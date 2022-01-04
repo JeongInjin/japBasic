@@ -9,6 +9,7 @@ import jpabook.jpashop.repository.OrderSearch;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
@@ -90,6 +91,34 @@ public class OrderApiController {
     @GetMapping("/api/v3/orders")
     public List<OrderDto> ordersV3() {
         List<Order> orders = orderRepository.findAllWithItem();
+
+        //repository 에 distinct 가 없으면 2 * 2 개가 중복없이 노출 된다.
+        for (Order order : orders) {
+            System.out.println("order ref = " + order + " id = " + order.getId());
+        }
+        List<OrderDto> result = orders.stream()
+                .map(OrderDto::new)
+                .collect(toList());
+
+        return result;
+    }
+
+    /**
+     * V3.1 엔티티를 조회해서 DTO로 변환 페이징 고려
+     * - ToOne 관계만 우선 모두 페치 조인으로 최적화
+     * - 컬렉션 관계는 hibernate.default_batch_fetch_size, @BatchSize로 최적화
+     * -----------------------------------------------------------------------------------------------------
+     * - hibernate.default_batch_fetch_size 의 크기 정할시 참조
+     * - 100 ~ 1000 사이를 권장.
+     * - DB 에 따라 in 절 파라미터를 1000개로 제한하도 한다.
+     * - 100 이나, 1000 이나 결국 데이터를 로딩해야 하므로 메모리 사용량은 같다
+     * - 1000으로 설정하는 것이 성능상 가장 좋으나, DB 혹은 애플리케이션 등이 순간 부하를 어디까지 견딜 수 있는지로 결정하면 된다.
+     * -----------------------------------------------------------------------------------------------------
+     */
+    @GetMapping("/api/v3.1/orders")
+    public List<OrderDto> ordersV3_page(@RequestParam(value = "offset", defaultValue = "0") int offset,
+                                        @RequestParam(value = "limit", defaultValue = "100") int limit) {
+        List<Order> orders = orderRepository.findAllWithMemberDelivery(offset, limit);
 
         //repository 에 distinct 가 없으면 2 * 2 개가 중복없이 노출 된다.
         for (Order order : orders) {
