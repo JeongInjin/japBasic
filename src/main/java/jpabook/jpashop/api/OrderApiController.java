@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static java.util.stream.Collectors.*;
-
+/* oneToMany 관겨시 조회*/
 /*
  * 엔티티를 조회해서 그대로 반환 : V1
  * 엔티티를 조회 후 DTO 로 변환 : V2
