@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -64,6 +65,9 @@ public class OrderSimpleApiController {
     @GetMapping("/api/v2/simple-orders")
     public List<SimpleOrderDto> orderV2() {
         List<Order> orders = orderRepository.findAllByString(new OrderSearch());
+//        orders.stream()
+//                .map(o -> new SimpleOrderDto(o))
+//                .collect(Collectors.toList());
 
         List<SimpleOrderDto> result = orders.stream()
                 .map(SimpleOrderDto::new)
@@ -76,6 +80,7 @@ public class OrderSimpleApiController {
      * V3. 엔티티를 조회해서 DTO로 변환(fetch join 사용O)
      * - fetch join으로 쿼리 1번 호출
      * 참고: fetch join에 대한 자세한 내용은 JPA 기본편 참고(정말 중요함)
+     * 이방법이 좋긴한데, 우리회사 테이블 컬럼은 왜이렇게 많지...고민이네 허매..
      */
     @GetMapping("/api/v3/simple-orders")
     public List<SimpleOrderDto> orderV3() {
