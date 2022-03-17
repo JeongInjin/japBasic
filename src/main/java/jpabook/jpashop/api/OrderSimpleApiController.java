@@ -41,12 +41,17 @@ public class OrderSimpleApiController {
      * 해결책 -> 	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-hibernate5' 추가 하고 @Bean 등록한다 -> Hibernate5Module
      * 해당 방법은 쓰지 않는다. Entity 는 노출 하지 않느다.
      */
+    /**
+     * 다시 공부겸 보니 좀 더 와닿네..
+     * 엔티티를 반환하지말고..필요데이터만 뽑아서 반환하자.
+     * EAGER 사용으로인해 피해를 실제로 받고있어서 고통스럽다..
+     */
     @GetMapping("/api/v1/simple-orders")
     public List<Order> ordersV1() {
         List<Order> all = orderRepository.findAllByString(new OrderSearch());
         for (Order order : all) {
-            order.getMember().getName();
-            order.getDelivery().getAddress();
+            order.getMember().getName(); //lazy 강제 초기화
+            order.getDelivery().getAddress(); //lazy 강제 초기화
         }
 
         return all;
